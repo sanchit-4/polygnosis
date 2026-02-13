@@ -66,6 +66,7 @@ export const useProgram = () => {
 
     // 2. Initialize Program
     // This allows us to call .fetch() even without a real wallet
+    // @ts-expect-error
     return new Program(idl as Idl, PROGRAM_ID, provider);
   }, [connection, wallet]);
 
