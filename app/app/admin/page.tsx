@@ -1,3 +1,5 @@
+"use client";
+
 import dynamic from "next/dynamic";
 
 // Dynamically import your Web3 component and force Next.js to skip SSR for it
