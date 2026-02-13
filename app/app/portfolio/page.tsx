@@ -22,6 +22,7 @@ export default function Portfolio() {
     if (!program || !wallet.publicKey) return;
 
     const fetchPositions = async () => {
+        // @ts-expect-error
         const allMarkets = await program.account.market.all();
         const myPositions = [];
 

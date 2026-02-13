@@ -15,6 +15,7 @@ export default function AdminPage() {
     if (!program) return;
     const fetchMarkets = async () => {
         // Fetch all markets
+        // @ts-expect-error
         const all = await program.account.market.all();
         // Filter: Only show markets created by ME (The connected wallet)
         const myMarkets = all.filter((m: { account: { authority: { toString: () => string | undefined; }; }; }) => 

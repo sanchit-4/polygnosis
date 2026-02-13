@@ -1295,6 +1295,7 @@ export default function MarketPage() {
     const fetchMarketData = async () => {
       try {
         const pubkey = new PublicKey(address as string);
+        // @ts-expect-error
         const account = await program.account.market.fetch(pubkey);
         setMarket(account);
 

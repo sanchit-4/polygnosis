@@ -133,6 +133,7 @@ export default function Home() {
         setLoading(true);
         // 1. Fetch all market accounts from the chain
         // This is the "Select * From Markets" query
+        // @ts-expect-error
         const allMarkets = (await program.account.market.all()) as unknown as MarketAccount[];
         setMarkets(allMarkets);
 
