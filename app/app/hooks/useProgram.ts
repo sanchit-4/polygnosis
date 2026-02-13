@@ -39,7 +39,8 @@ import { useMemo } from "react";
 import { useAnchorWallet, useConnection } from "@solana/wallet-adapter-react";
 import { AnchorProvider, Program, Idl, setProvider } from "@coral-xyz/anchor";
 import { PublicKey } from "@solana/web3.js";
-import idl from "../idl/polygnosis.json"; 
+import idl from "../idl/polygnosis.json";
+ 
 
 // YOUR DEPLOYED PROGRAM ID
 const PROGRAM_ID = new PublicKey("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"); 
@@ -65,9 +66,7 @@ export const useProgram = () => {
     setProvider(provider);
 
     // 2. Initialize Program
-    // This allows us to call .fetch() even without a real wallet
-    // @ts-expect-error
-    return new Program(idl as Idl, PROGRAM_ID, provider);
+    return new Program(idl as Idl, provider);
   }, [connection, wallet]);
 
   return { program };
