@@ -15,4 +15,4 @@ pub const SEED_NO_MINT: &[u8] = b"no_mint";
 // Precision for math (since Solana has no decimals)
 pub const BASIS_POINTS: u64 = 10000;
 
-pub const ADMIN_PUBKEY: &str = "REPLACE_WITH_YOUR_WALLET_ADDRESS";
+pub const ADMIN_PUBKEY: &str = "HEtRGZPUJX5WVx4aXE9EnDxK4er6ZcajMccaotiZH8Z5";
