@@ -38,6 +38,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers"; // Import the file we just made
+import FaucetModal from "./components/FaucetModal";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -56,6 +57,7 @@ export default function RootLayout({
       <body className={inter.className}>
         {/* We wrap everything inside Providers so every page can access the wallet */}
         <Providers>
+            <FaucetModal/>
             {children}
         </Providers>
       </body>

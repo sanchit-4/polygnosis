@@ -4,12 +4,13 @@ import { useState, useEffect } from "react";
 import { useProgram } from "../hooks/useProgram";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { PublicKey } from "@solana/web3.js";
-import { BN } from "@coral-xyz/anchor";
 import Navbar from "../components/Navbar";
+import { getAssociatedTokenAddress } from "@solana/spl-token"; // ADD THIS
+import { BN } from "@coral-xyz/anchor"; // Ensure this is imported
 
 // !!! YOUR SPECIFIC ADMIN ADDRESS !!!
 const ADMIN_ADDRESS = "HEtRGZPUJX5WVx4aXE9EnDxK4er6ZcajMccaotiZH8Z5";
-const COLLATERAL_MINT = "Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr"; // Your Custom Token
+const COLLATERAL_MINT = "2saBrUcN5bZYxj6BJnpuT6r4iZQQ7vdbUXzr8nHenfiL"; // Your Custom Token
 
 export default function CreateMarket() {
   const { program } = useProgram();
@@ -39,11 +40,65 @@ export default function CreateMarket() {
         const marketId = new BN(Date.now());
         const endTime = new BN(new Date(expiry).getTime() / 1000);
         
+        // 1. Create Market
+        console.log("Creating Market...");
         await program?.methods.createMarket(marketId, question, endTime)
           .accounts({ collateralMint: new PublicKey(COLLATERAL_MINT) })
           .rpc();
+
+        // 2. Auto-Add Liquidity (10,000 Tokens)
+        console.log("Seeding Liquidity...");
+        // Delay slightly to ensure RPC catches up
+        await new Promise(r => setTimeout(r, 2000));
+
+        const amountToAdd = 10000; 
+        const decimals = 1000000; // 6 decimals
+        const amt = new BN(amountToAdd * decimals); 
         
-        alert("Market Created!");
+        // We need to derive the PDA address we just created
+        const [marketPda] = PublicKey.findProgramAddressSync(
+            [Buffer.from("market"), marketId.toArrayLike(Buffer, "le", 8)],
+            program!.programId
+        );
+        
+        const [vaultCollateral] = PublicKey.findProgramAddressSync(
+            [Buffer.from("vault"), marketPda.toBuffer()],
+            program!.programId
+        );
+        const [yesMint] = PublicKey.findProgramAddressSync(
+             [Buffer.from("yes_mint"), marketPda.toBuffer()],
+             program!.programId
+        );
+        const [noMint] = PublicKey.findProgramAddressSync(
+             [Buffer.from("no_mint"), marketPda.toBuffer()],
+             program!.programId
+        );
+        // Vault YES/NO
+        const [vaultYes] = PublicKey.findProgramAddressSync(
+            [Buffer.from("amm_yes"), marketPda.toBuffer()],
+            program!.programId
+        );
+        const [vaultNo] = PublicKey.findProgramAddressSync(
+            [Buffer.from("amm_no"), marketPda.toBuffer()],
+            program!.programId
+        );
+
+        const payerCollateral = await getAssociatedTokenAddress(new PublicKey(COLLATERAL_MINT), wallet.publicKey!);
+
+        await program?.methods.addLiquidity(amt)
+          .accounts({
+              market: marketPda,
+              payerCollateralAccount: payerCollateral,
+              vaultCollateral: vaultCollateral,
+              yesMint: yesMint,
+              noMint: noMint,
+              vaultYes: vaultYes,
+              vaultNo: vaultNo,
+          })
+          .rpc();
+        
+        alert("Market Created & Funded with $10,000 Liquidity!");
+        // Redirect or clear form
     } catch (err: any) {
         console.error(err);
         alert("Error: " + err.toString());
